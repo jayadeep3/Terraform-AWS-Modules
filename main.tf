@@ -72,3 +72,16 @@ module "private_ec2" {
   private_subnet_id = module.private_subnet.private_subnet_id
   security_group_id = module.security_group.security_group
 }
+module "eks" {
+  source       = "./modules/eks_cluster"
+  cluster_name = "${var.cluster_name}-${local.environment}"
+  private_subnet_id = module.private_subnet.private_subnet_id
+  environment = local.environment
+  instance_types = var.instance_types
+}
+
+module "s3_bucket" {
+  source            = "./modules/s3_bucket"
+  bucket_name       = "${var.bucket_name}-${local.environment}"
+  enable_versioning = true
+}
