@@ -30,3 +30,11 @@ output "internet_gateway" {
 output "nat_gateway" {
   value = module.nat_gateway
 }
+output "eks_cluster" {
+  description = "EKS cluster"
+  value = module.eks
+}
+output "s3_bucket" {
+  description = "Private S3 Bucket"
+  value = module.s3_bucket
+}
