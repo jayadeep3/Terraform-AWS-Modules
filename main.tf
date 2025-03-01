@@ -1,24 +1,74 @@
-provider "aws" {
-  region = var.region
-}
-
-locals {
-  environment = terraform.workspace
-}
-
 module "vpc" {
-  source            = "./modules/vpc"
+  source                      = "./modules/vpc"
+  environment                 = local.environment
+  vpc_cidr_block              = var.vpc_cidr_block
+  allowed_ssh_cidr            = var.allowed_ssh_cidr
+}
+
+module "public_subnet" {
+  source              = "./modules/public_subnet"
+  vpc_id              = module.vpc.vpc_id
+  public_subnet_cidr  = var.public_subnet_cidr
+  availability_zone   = var.availability_zone
+  environment         = local.environment
+}
+
+module "private_subnet" {
+  source              = "./modules/private_subnet"
+  vpc_id              = module.vpc.vpc_id
+  private_subnet_cidr = var.private_subnet_cidr
+  availability_zone   = var.availability_zone
+  environment         = local.environment
+}
+
+module "internet_gateway" {
+  source      = "./modules/internet_gateway"
+  vpc_id      = module.vpc.vpc_id
+  environment = local.environment
+}
+
+module "public_route_table" {
+  source            = "./modules/public_route_table"
+  vpc_id            = module.vpc.vpc_id
+  public_subnet_id  = module.public_subnet.public_subnet_id
+  igw_id            = module.internet_gateway.igw_id
   environment       = local.environment
-  vpc_cidr_block    = lookup(var.vpc_cidr_block, local.environment, "10.0.0.0/16")
-  subnet_cidr_block = lookup(var.subnet_cidr_block, local.environment, "10.0.1.0/24")
-  availability_zone = lookup(var.availability_zone, local.environment, "ap-south-1a")
+}
+
+module "private_route_table" {
+  source            = "./modules/private_route_table"
+  vpc_id            = module.vpc.vpc_id
+  private_subnet_id = module.private_subnet.private_subnet_id
+  environment       = local.environment
+}
+
+module "nat_gateway" {
+  source            = "./modules/nat_gateway"
+  public_subnet_id  = module.public_subnet.public_subnet_id
+  environment       = local.environment
+}
+
+module "security_group" {
+  source            = "./modules/sg"
+  environment       = local.environment
+  vpc_id            = module.vpc.vpc_id
   allowed_ssh_cidr  = var.allowed_ssh_cidr
 }
 
-module "ec2" {
-  source            = "./modules/ec2"
+module "public_ec2" {
+  source            = "./modules/public_ec2"
   environment       = local.environment
-  instance_type     = lookup(var.instance_type, local.environment, "t2.micro")
-  subnet_id         = module.vpc.subnet_id
-  security_group_id = module.vpc.security_group_id
+  ami_id            = var.ami_id
+  instance_type     = var.instance_type
+  public_subnet_id  = module.public_subnet.public_subnet_id
+  security_group_id = module.security_group.security_group
+}
+
+module "private_ec2" {
+  source            = "./modules/private_ec2"
+  environment       = local.environment
+  ami_id            = var.ami_id
+  instance_type     = var.instance_type
+  private_subnet_id = module.private_subnet.private_subnet_id
+  security_group_id = module.security_group.security_group
 }
