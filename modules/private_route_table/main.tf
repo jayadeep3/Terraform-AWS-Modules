@@ -8,6 +8,6 @@ resource "aws_route_table" "private" {
 }
 
 resource "aws_route_table_association" "private" {
-  subnet_id      = var.private_subnet_id.id
+  subnet_id      = var.private_subnet_id[0]  
   route_table_id = aws_route_table.private.id
 }
