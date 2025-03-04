@@ -8,6 +8,8 @@ variable "allowed_ssh_cidr" {
     type = list(string)
 }
 variable "instance_type" {}
-variable "instance_types" {}
+variable "instance_types" {
+    type = list(string)
+}
 variable "cluster_name" {}
 variable "bucket_name" {}
