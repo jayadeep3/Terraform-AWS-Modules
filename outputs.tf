@@ -32,9 +32,9 @@ output "nat_gateway" {
 }
 output "eks_cluster" {
   description = "EKS cluster"
-  value = module.eks
+  value = module.eks.eks_cluster_endpoint
 }
 output "s3_bucket" {
   description = "Private S3 Bucket"
-  value = module.s3_bucket
+  value = module.s3_bucket.s3_bucket_name
 }
