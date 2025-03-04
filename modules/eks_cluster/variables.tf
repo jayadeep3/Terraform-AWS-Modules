@@ -5,7 +5,10 @@ variable "cluster_name" {
 
 variable "private_subnet_id" {
   description = "Private subnet ID for the EKS cluster"
+  type        = list(string)
 }
 
 variable "environment" {}
-variable "instance_types" {}
+variable "instance_types" {
+  type        = list(string)
+}
