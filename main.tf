@@ -85,3 +85,11 @@ module "s3_bucket" {
   bucket_name       = "${var.bucket_name}-${local.environment}"
   enable_versioning = true
 }
+
+module "vpc_endpoint" {
+  source = "./modules/vpc_endpoint"
+  vpc_id = module.vpc.vpc_id
+  security_group_id = module.security_group.security_group
+  private_subnet_id = module.private_subnet.private_subnet_id
+  aws_region = var.aws_region
+}
