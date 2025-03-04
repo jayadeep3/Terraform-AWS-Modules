@@ -8,3 +8,4 @@ aws_region = "ap-south-1"
 allowed_ssh_cidr = ["0.0.0.0/0"]
 cluster_name = "test"
 bucket_name = "test"
+instance_types = ["t3.medium"]
